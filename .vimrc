@@ -39,10 +39,15 @@ Plug 'tpope/vim-commentary'
 Plug 'w0rp/ale'
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
 Plug 'neoclide/coc-tsserver', {'do': 'yarn install --frozen-lockfile'}
-Plug 'nanotech/jellybeans.vim'
+Plug 'rust-lang/rust.vim'
+Plug 'morhetz/gruvbox'
 call plug#end()
 
-colorscheme jellybeans
+" Gruvbox
+let g:gruvbox_contrast_dark = "hard"
+let g:gitgutter_override_sign_column_highlight = 1
+colorscheme gruvbox
+
 filetype indent plugin on
 
 " ack.vim
@@ -55,6 +60,7 @@ nnoremap <Leader>a :Ack!<Space>
 nnoremap <leader>A :Ack "\b<cword>\b"<CR>
 
 " vim-gitgutter
+" let g:gruvbox_invert_signs = 1
 set updatetime=250 "updates gutter more frequently
 
 " junegunn/fzf
@@ -90,3 +96,5 @@ let g:ale_javascript_prettier_use_local_config = 1
 " Coc.vim
 command! -nargs=0 OR   :call     CocAction('runCommand', 'editor.action.organizeImport')
 
+" Rust
+let g:rustfmt_autosave = 1
