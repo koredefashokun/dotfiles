@@ -4,9 +4,10 @@ set number
 set t_Co=256
 set background=dark
 set incsearch
-set relativenumber
 set mousehide
 set mouse=a
+set termguicolors
+set updatetime=250
 
 " Editor text
 set tabstop=2
@@ -23,33 +24,77 @@ set nowritebackup
 
 " PLUGINS
 call plug#begin("~/.vim/plugged")
-Plug 'airblade/vim-gitgutter'
-Plug 'chemzqm/vim-jsx-improve'
-Plug 'hail2u/vim-css3-syntax'
+Plug 'jparise/vim-graphql'
 Plug 'jremmen/vim-ripgrep'
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install -all' }
 Plug 'junegunn/fzf.vim'
-Plug 'jiangmiao/auto-pairs'
-Plug 'leafgarland/typescript-vim'
-Plug 'jparise/vim-graphql'
 Plug 'mileszs/ack.vim'
-Plug 'peitalin/vim-jsx-typescript'
+Plug 'neoclide/coc.nvim', {'branch': 'release'}
+Plug 'rust-lang/rust.vim'
 Plug 'styled-components/vim-styled-components', { 'branch': 'main' }
 Plug 'tpope/vim-commentary'
-Plug 'w0rp/ale'
-Plug 'neoclide/coc.nvim', {'branch': 'release'}
-Plug 'neoclide/coc-tsserver', {'do': 'yarn install --frozen-lockfile'}
-Plug 'rust-lang/rust.vim'
-Plug 'morhetz/gruvbox'
+Plug 'tomlion/vim-solidity'
+Plug 'lervag/vimtex'
 call plug#end()
 
-" Gruvbox
-let g:gruvbox_contrast_dark = "hard"
-let g:gitgutter_override_sign_column_highlight = 1
-colorscheme gruvbox
+" COC config
+let g:coc_global_extensions = [
+\ 'coc-pairs',
+\ 'coc-tsserver',
+\ 'coc-eslint',
+\ 'coc-prettier',
+\ 'coc-json',
+\ 'coc-rust-analyzer'
+\ ]
 
+" Use <c-space> to trigger completion.
+" inoremap <silent><expr> <c-space> coc#refresh()
+
+" Use <cr> to trigger completion.
+inoremap <expr> <cr> coc#pum#visible() ? coc#pum#confirm() : "\<CR>"
+
+" Remap keys for gotos
+nmap <silent> gd <Plug>(coc-definition)
+nmap <silent> gy <Plug>(coc-type-definition)
+nmap <silent> gi <Plug>(coc-implementation)
+nmap <silent> gr <Plug>(coc-references)
+
+" Use K to show documentation in preview window
+nnoremap <silent> K :call <SID>show_documentation()<CR>
+function! s:show_documentation()
+	if (index(['vim','help'], &filetype) >= 0)
+		execute 'h '.expand('<cword>')
+	else
+		call CocAction('doHover')
+	endif
+endfunction
+
+" Highlight symbol under cursor on CursorHold
+autocmd CursorHold * silent call CocActionAsync('highlight')
+
+" Remap for rename current word
+nmap <F2> <Plug>(coc-rename)
+
+" Remap for format selected region
+xmap <leader>f  <Plug>(coc-format-selected)
+nmap <leader>f  <Plug>(coc-format-selected)
+
+" Use `:Format` to format current buffer
+command! -nargs=0 Format :call CocAction('format')
+" Use `:Fold` to fold current buffer
+command! -nargs=? Fold :call CocAction('fold', <f-args>)
+" use `:OR` for organize import of current buffer
+command! -nargs=0 OR :call CocAction('runCommand', 'editor.action.organizeImport')
+" Run prettier on save
+command! -nargs=0 Prettier :CocCommand prettier.formatFile
+
+" Colorscheme
+" let g:gruvbox_contrast_dark = "hard"
+" let g:gruvbox_invert_signs = 0
+" let g:gruvbox_invert_selection = 0
+" let g:gitgutter_override_sign_column_highlight = 1
 filetype indent plugin on
-
+-
 " ack.vim
 if executable("ag")
 	let g:ackprg = "ag --vimgrep"
@@ -59,12 +104,8 @@ nnoremap <Leader>a :Ack!<Space>
 " Run ack fast
 nnoremap <leader>A :Ack "\b<cword>\b"<CR>
 
-" vim-gitgutter
-" let g:gruvbox_invert_signs = 1
-set updatetime=250 "updates gutter more frequently
-
 " junegunn/fzf
-let $FZF_DEFAULT_COMMAND= "ag -g \"\""
+let $FZF_DEFAULT_COMMAND = "ag -g \"\""
 nnoremap <C-P> :Files<CR>
 inoremap <C-P> <ESC>:Files<CR>i
 
@@ -74,27 +115,8 @@ let g:netrw_liststyle=3
 nnoremap <C-e> :Lexplore<CR>
 autocmd FileType netrw setl bufhidden=wipe
 
-" Asynchronous Lint Engine (ALE)
-" Limit linters used for JavaScript.
-let g:ale_linters = { "javascript": ["eslint"], "typescript": ["eslint"] }
-let g:ale_fixers = { "javascript": ["eslint"], "typescript": ["eslint", "prettier"] }
-" highlight clear ALEErrorSign " otherwise uses error bg color (typically red)
-" highlight clear ALEWarningSign " otherwise uses error bg color (typically red)
-let g:ale_completion_enabled = 1
-let g:ale_sign_column_always = 1
-" %linter% is the name of the linter that provided the message
-" %s is the error or warning message
-let g:ale_echo_msg_format = "%s [%linter%]"
-" Map keys to navigate between lines with errors and warnings.
-nnoremap <leader>an :ALENextWrap<cr>
-nnoremap <leader>ap :ALEPreviousWrap<cr>
-" run fixers on save
-let g:ale_fix_on_save = 1
-" respect prettier configs
-let g:ale_javascript_prettier_use_local_config = 1
-
-" Coc.vim
-command! -nargs=0 OR   :call     CocAction('runCommand', 'editor.action.organizeImport')
-
 " Rust
 let g:rustfmt_autosave = 1
+
+" Zathura
+let g:vimtex_view_method = 'zathura'
